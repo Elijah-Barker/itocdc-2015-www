@@ -79,7 +79,7 @@
 
 		//include 'opendb.php';//included in sessions.php
         // get top N trending videos
-        $clipsResult = FetchClips(60);
+        $clipsResult = FetchClips(12);
         if($clipsResult->rowCount() > 0)
         {
           $counter = 1;
