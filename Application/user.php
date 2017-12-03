@@ -1,30 +1,20 @@
 <?php
-  include 'config.php';
-  include 'headers.php';
-  include 'sessions.php';
+include 'config.php';
+include 'headers.php';
+include 'sessions.php';
 
-  // open connection to the database
-  include 'opendb.php';
+// open connection to the database
+//include 'opendb.php';//included in sessions.php
 
-  $userID = NULL;
-  $media = $mediaDir;
-  $username = $_GET["username"];
 
-  try {
-    // get clip properties
-    $userResult = mysql_query("SELECT id, email FROM users WHERE username='" . $username . "'");
+$media = $mediaDir;
+$username = $_GET["username"];
 
-    if(mysql_num_rows($userResult) == 0){
-        $userID = NULL;
-    } else {
-        $userRow = mysql_fetch_row($userResult);
-        $userID = $userRow[0];
-        $email = $userRow[1];
-    }
-    
-  } catch (Exception $e) {
-    $userID = NULL;
-  }
+
+$userRow = getUserInfo($username);
+$userID = $userRow['id'];
+$email = $userRow['email'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +27,7 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-    <title>Completely Digital Clips<?php if($clip != NULL){echo " - $title";} ?></title>
+    <title>Completely Digital Clips</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/static/css/bootstrap.css" rel="stylesheet">
@@ -96,23 +86,22 @@
       <center>
       <?php if(isUserLoggedIn()): ?>
         <h1>Account Information</h1>
-        <p><b>Username: </b> <?php echo $username; ?></p>
-        <p><b>Email: </b> <?php echo $email; ?></p>
+        <p><b>Username: </b> <?php echo CleanXSS($username); ?></p>
+        <p><b>Email: </b> <?php if ($_SESSION['Email'] == $email){echo CleanXSS($email);}else{echo "***@***.***";} ?></p>
       <?php endif; ?>
       <?php
         if($userID){
           echo "<h1>User Videos</h1>";
           // get user videos
-          $clipsResult = mysql_query("SELECT host, title, shortname, posted, views FROM clips WHERE user='" . $userID . "' ORDER BY views DESC, posted DESC");
-          $postedClips = FALSE;
-          while($clipsRow = mysql_fetch_row($clipsResult)){
+          $clipsResult = FetchUserClips($userID);
+          while($clipsRow = $clipsResult->fetch(PDO::FETCH_ASSOC)){
             $postedClips = TRUE;
-            $host = $clipsRow[0];
-            $title = $clipsRow[1];
-            $shortname = $clipsRow[2];
-            $posted = $clipsRow[3];
-            $views = $clipsRow[4];
-            echo "<a href=\"/view.php?video=$shortname\"><h2>$title</h2></a>";
+            $host = $clipsRow['host'];
+            $title = $clipsRow['title'];
+            $shortname = $clipsRow['shortname'];
+            $posted = $clipsRow['posted'];
+            $views = $clipsRow['views'];
+            echo "<a href=\"/view.php?video=$shortname\"><h2>".CleanXSS($title)."</h2></a>";
             echo "<a href=\"/view.php?video=$shortname\"><img src=\"http://$host$media/$shortname.png\" /></a>";
             echo "<p>$views views since $posted</p><br />";
           }

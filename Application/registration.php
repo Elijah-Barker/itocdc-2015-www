@@ -1,6 +1,13 @@
 <?php
-  include 'config.php';
-  include 'headers.php';
+include 'config.php';
+include 'headers.php';
+
+if(!empty($_SESSION['LoggedIn']) && !empty($_SESSION['Email']))
+{
+	session_unset();
+	session_destroy();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,19 +95,19 @@
      ?>
      </font>
      <form name=registration action="register.php" method="post" onSubmit="return checkRegistration();">
-       <label for="email">Email</label><br />
-       <input type="email" name="email"><br />
-       <br />
-       <label for="username">Username (display name)</label><br />
-       <input name="username"><br />
-       <br />
-       <label for="password">Password</label><br />
-       <input name="password" type="password"><br />
-       <br />
-       <label for="confirm-password">Confirm Password</label><br />
-       <input name="confirm-password" type="password"><br />
-       <br />
-       <input value="Register" type="submit">
+		<label for="email">Email</label><br />
+		<input type="email" name="email" autofocus><br />
+		<br />
+		<label for="username">Username (display name)</label><br />
+		<input name="username"><br />
+		<br />
+		<label for="password">Password</label><br />
+		<input name="password" type="password"><br />
+		<br />
+		<label for="confirm-password">Confirm Password</label><br />
+		<input name="confirm-password" type="password"><br />
+		<br />
+		<input value="Register" type="submit">
      </form>
      <br />
      <!-- FOOTER -->

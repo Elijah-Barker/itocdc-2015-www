@@ -4,44 +4,47 @@
   include 'sessions.php';
 
 // open connection to the database
-include 'opendb.php';
+//include 'opendb.php';//included in sessions.php
 
 $clip = NULL;
 $media = $mediaDir;
 $shortname = $_GET["video"];
 
-try {
-    // get clip properties
-    $clipResult = mysql_query("SELECT host, title, description, posted, user, views, extension FROM clips WHERE shortname='" . $shortname . "'");
+try
+{
+	// get clip properties
+	$clipResult = FetchClip($shortname);
 
-    if(mysql_num_rows($clipResult) == 0){
-        $clip = NULL;
-    } else {
-        $clipRow = mysql_fetch_row($clipResult);
-        $host = $clipRow[0];
-        $shareURL = "http://$WEBSITE_DOMAIN_NAME/view.php?video=$shortname";
-        $title = $clipRow[1];
-        $description = $clipRow[2];
-        $posted = $clipRow[3];
-        $userID = $clipRow[4];
-        $views = $clipRow[5];
-        $extension = $clipRow[6];
+	if($clipResult->rowCount() == 0)
+	{
+		$clip = NULL;
+	}
+	else
+	{
+		$clipRow = $clipResult->fetch(PDO::FETCH_ASSOC);
+		$host = $clipRow['host'];
+		$shareURL = "http://$WEBSITE_DOMAIN_NAME/view.php?video=$shortname";
+		$title = $clipRow['title'];
+		$description = $clipRow['description'];
+		$posted = $clipRow['posted'];
+		$userID = $clipRow['user'];
+		$views = $clipRow['views'];
+		$extension = $clipRow['extension'];
 
-        // get username
-        $userResult = mysql_query("SELECT username FROM users WHERE id='" . $userID . "'");
-        $userRow = mysql_fetch_row($userResult);
-        $username = $userRow[0];
+		// get username
+		$username = userIDToUsername($userID);
 
-        // set the clip the filename
-        $clip = "$shortname.$extension";
+		// set the clip the filename
+		$clip = "$shortname.$extension";
 
-        // update view counter
-        mysql_query("UPDATE clips SET views=views+1 WHERE shortname='" . $shortname . "'");
-    }
-    
-  } catch (Exception $e) {
-    $clip = NULL;
-  }
+		// update view counter
+		updateHitCount($shortname);
+	}
+}
+catch (Exception $e)
+{
+	$clip = NULL;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -112,16 +115,16 @@ try {
      <hr class="featurette-divider">
      <center>
      <?php if($clip): ?>
-     <h1><?php echo $title ?></h1>
+     <h1><?php echo CleanXSS($title); ?></h1>
      <video src="<?php echo "http://$host$media/$clip" ?>" width="640" height="390" class="mejs-player" data-mejsoptions='{"alwaysShowControls": true}'></video>
      <br />
      <div style="max-width: 640px; height: 150px;">
        <div style="float: left; max-width: 420px; width: 100%; height: 100%;">
-         <pre style="text-align: left; height: 100%;"><?php echo $description ?></pre>
+         <pre style="text-align: left; height: 100%;"><?php echo CleanXSS($description) ?></pre>
        </div>
        <div style="float: left; margin-left: 20px; max-width: 200px; width: 100%;">
          <pre><b>Views: <?php echo $views ?></b></pre>
-         <pre><b>Posted by: <a href="/user.php?username=<?php echo $username ?>"><?php echo $username ?></a></b></pre>
+         <pre><b>Posted by: <a href="/user.php?username=<?php echo CleanXSS($username); ?>"><?php echo CleanXSS($username); ?></a></b></pre>
          <b>Share&nbsp;</b><input type="text" name="share" value="<?php echo $shareURL ?>" disabled><br />
        </div>
      </div>
@@ -130,8 +133,9 @@ try {
 		var v = document.getElementsByTagName("video")[0];
 		new MediaElement(v, {success: function(media) {
                     <?php 
-                      if(isset($_GET["t"])){
-                        $seconds = $_GET["t"];
+                      if(isset($_GET["t"]))
+                      {
+					    $seconds = $_GET["t"];
                         echo "media.setCurrentTime($seconds);";
                       }
                     ?>

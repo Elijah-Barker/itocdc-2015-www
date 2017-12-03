@@ -1,12 +1,15 @@
 <?php
-// ***** Delete from here... *****
-  function authenticated_session($username) {
+/* ***** Delete from here... *****
+  function authenticated_session($username)
+  {
     return sha1(md5($username));
   }
-// ***** ...to here, once code is secured *****
+// ***** ...to here, once code is secured *****/
 
 session_start();
 
+include 'opendb.php';
+include 'usercheck.php';
 // if session is set
 if(session_status() != PHP_SESSION_NONE)
 {
@@ -23,7 +26,14 @@ if(session_status() != PHP_SESSION_NONE)
 			header('Location: /login.php?message=Session%20timed%20out.%20Please%20log%20in.');
 			exit();
 		}
-
+		if ( !(EmailExists($_SESSION['Email'])) )
+		{
+			session_unset();
+			session_destroy();
+			header('Location: /login.php?message=Email%20no%20longer%20exists.%20Please%20log%20in.');
+			exit();
+		}
+		
 		if((time() - $_SESSION['Created']) > 10000)
 		{
 			//Session is too old. Destroy it.

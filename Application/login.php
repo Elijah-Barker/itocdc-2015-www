@@ -1,6 +1,13 @@
 <?php
-  include 'config.php';
-  include 'headers.php';
+include 'config.php';
+include 'headers.php';
+
+if(!empty($_SESSION['LoggedIn']) && !empty($_SESSION['Email']))
+{
+	session_unset();
+	session_destroy();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +90,7 @@
      ?> 
      <form name=login action="authenticate.php" method="post" onSubmit="return checkLogin();">
        <label for="email">Email</label><br />
-       <input type="email" name="email"><br />
+       <input type="email" name="email" autofocus><br />
        <br />
        <label for="password">Password</label><br />
        <input name="password" type="password"><br />

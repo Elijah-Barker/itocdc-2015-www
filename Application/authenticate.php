@@ -1,30 +1,25 @@
 <?php
 
 // session utils
+include 'config.php';
 include 'sessions.php';
+
+if(!empty($_SESSION['LoggedIn']) && !empty($_SESSION['Email']))
+{
+	session_unset();
+	session_destroy();
+}
 
 // get POST information from login form
 $email=$_POST["email"];
 $password=$_POST["password"];
 
 // open connection to the database
-include 'config.php';
-include 'opendb.php';
-
-// ***** implement new session here *****
-
-// use prepared statement
-// select password where email = email
-// then check password
-//// get user data from the users table (assumes users table already exists!)
-$result = mysql_query("SELECT * FROM users WHERE email='" . $email . "'" . " AND password=" . "'" . $password . "'");
-
-// authenticate user
-$login = mysql_num_rows($result) > 0;
-
+//include 'opendb.php';//included in sessions.php
 
 //create new session
-if($login)
+//include 'usercheck.php';//included in sessions.php
+if(AuthUser($email, $password))
 {
 	// set an active cookie for this username
 	$_SESSION['LoggedIn'] = true;
@@ -41,8 +36,6 @@ else
 	session_destroy();
 	header('Location: /login.php?message=Login%20Failed');
 }
-// *****  *****
-
 
 // close connection to the database
 include 'closedb.php';

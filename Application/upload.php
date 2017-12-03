@@ -4,7 +4,7 @@ include 'config.php';
 include 'sessions.php';
 
 // open connection to the database
-include 'opendb.php';
+//include 'opendb.php';//included in sessions.php
 
 function generateShortName($length = 11)
 {
@@ -110,13 +110,11 @@ if(isUserLoggedIn())
 		}
 
 
-		// #################################### Use Prepared Statement and session data ##############################
-		$userResult = mysql_query("SELECT id FROM users WHERE email='" . $_SESSION['Email'] . "'");
-		$userRow = mysql_fetch_row($userResult);
-		$userID = $userRow[0];
+		$userID = emailToUserID($_SESSION['Email']);
 
 		// insert video into clips table
-		$insertResult = mysql_query("INSERT INTO clips (host, shortname, title, description, user, extension) VALUES ('$APPLICATION_HOSTNAME', '$shortname', '$title', '$description', '$userID', '$extension')");
+		$insertResult = insertVideo($APPLICATION_HOSTNAME, $shortname, $title, $description, $userID, $extension);
+		//$insertResult = mysql_query("INSERT INTO clips (host, shortname, title, description, user, extension) VALUES ('$APPLICATION_HOSTNAME', '$shortname', '$title', '$description', '$userID', '$extension')");
 		if ($insertResult)
 		{
 			// success! view the video
@@ -125,7 +123,6 @@ if(isUserLoggedIn())
 		}
 		else
 		{
-			header('Location: /post.php?message=' . urlencode(mysql_error($conn)));
 			exit();
 		}
 	}

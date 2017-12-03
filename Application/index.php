@@ -77,30 +77,37 @@
         <table style="width:100%;">
         <?php
 
-        include 'opendb.php';
-
-        $N = 60;
+		//include 'opendb.php';//included in sessions.php
         // get top N trending videos
-        $clipsResult = mysql_query("SELECT host, title, shortname, posted, views FROM clips ORDER BY views DESC, posted DESC LIMIT $N");
-        if(mysql_num_rows($clipsResult) > 0){
+        $clipsResult = FetchClips(60);
+        if($clipsResult->rowCount() > 0)
+        {
           $counter = 1;
           echo "<tr>";
-          while($clipsRow = mysql_fetch_row($clipsResult)){
-            $host = $clipsRow[0];
-            $title = $clipsRow[1];
-            $shortname = $clipsRow[2];
-            $posted = $clipsRow[3];
-            $views = $clipsRow[4];
-            echo "<td align=\"center\"><a href=\"/view.php?video=$shortname\"><h2>$title</h2></a><a href=\"/view.php?video=$shortname\"><img src=\"http://$host$media/$shortname.png\" /></a><p><b>$views views since <i>$posted</i></b></p></td>";
-            if($counter == 3){
+          while($clipsRow = $clipsResult->fetch(PDO::FETCH_ASSOC))
+          //for ($x = 0; $x < $clipsResult->rowCount() ; x++)
+          {
+			//var_dump($clipsRow);
+            $host = $clipsRow['host'];
+            $title = $clipsRow['title'];
+            $shortname = $clipsRow['shortname'];
+            $posted = $clipsRow['posted'];
+            $views = $clipsRow['views'];
+            echo "<td align=\"center\"><a href=\"/view.php?video=$shortname\"><h2>".CleanXSS($title)."</h2></a><a href=\"/view.php?video=$shortname\"><img src=\"http://$host$media/$shortname.png\" /></a><p><b>$views views since <i>$posted</i></b></p></td>";
+            if($counter == 3)
+            {
               echo "</tr><tr>";
               $counter = 1;
-            } else {
+            }
+            else
+            {
               $counter = $counter + 1;
             }
           }
           echo "</tr>";
-        } else {
+        }
+        else
+        {
           echo "<h1>Coming soon!</h1>";
         }
       ?>
