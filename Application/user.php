@@ -1,6 +1,7 @@
 <?php
   include 'config.php';
   include 'headers.php';
+  include 'sessions.php';
 
   // open connection to the database
   include 'opendb.php';
@@ -76,7 +77,7 @@
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
                 <li><a href="/index.php">Home</a></li>
-                <?php if(isset($_COOKIE["PHPSESSID"])): ?> 
+                <?php if(isUserLoggedIn()): ?> 
                   <li><a href="/post.php">Post Video</a></li>
                   <li><a href="/logout.php">Logout</a></li>
                 <?php else: ?>
@@ -93,7 +94,7 @@
     <div class="container marketing">
       <hr class="featurette-divider">
       <center>
-      <?php if(isset($_COOKIE["PHPSESSID"])): ?>
+      <?php if(isUserLoggedIn()): ?>
         <h1>Account Information</h1>
         <p><b>Username: </b> <?php echo $username; ?></p>
         <p><b>Email: </b> <?php echo $email; ?></p>

@@ -1,6 +1,7 @@
 <?php
   include 'config.php';
   include 'headers.php';
+  include 'sessions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,9 +52,10 @@
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
                 <li><a href="/index.php">Home</a></li>
-                <?php if(isset($_COOKIE["PHPSESSID"])): ?> 
-                  <li><a href="/logout.php">Logout</a></li>
+                <?php if(isUserLoggedIn()): ?> 
                   <li><a href="/post.php">Post Video</a></li>
+                  <li><a href="/logout.php">Logout</a></li>
+                  <!-- the ODC is real -->
                 <?php else: ?>
                   <li><a href="/login.php">Login</a></li>
                   <li><a href="/registration.php">Register</a></li>

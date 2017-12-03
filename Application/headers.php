@@ -1,4 +1,5 @@
 <?php
+	// ***** combine with config.php? *****
   // security header settings
-  header("X-XSS-Protection: 0");
+  header("X-XSS-Protection: 1");
 ?> 

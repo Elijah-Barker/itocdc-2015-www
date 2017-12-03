@@ -1,5 +1,11 @@
 <?php
+include 'sessions.php';
 // clear session
-setcookie("PHPSESSID", "", time()-3600);
-header('Location: /index.php');
+if(!empty($_SESSION['LoggedIn']) && !empty($_SESSION['Email']))
+{
+	session_unset();
+	session_destroy();
+	header('Location: /index.php');
+	exit();
+}
 ?>
